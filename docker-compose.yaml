@@ -52,21 +52,22 @@ services:
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: true
       KC_HTTP_PORT: 8080
+      KC_HTTP_RELATIVE_PATH: /auth
       
       # Hostname configuration for development
       KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
       KC_HOSTNAME: https://localhost/auth/
       KC_HOSTNAME_ADMIN: https://localhost/auth/
     networks:
       - auth
     ports:
       - "8080:8080"
-    command: >
-      bash -c "
-      /opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import --override &&
-      /opt/keycloak/bin/kc.sh start
-      "
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        /opt/keycloak/bin/kc.sh import --dir=/opt/keycloak/data/import --override=true &&
+        /opt/keycloak/bin/kc.sh start
     volumes:
       # Mount realm configuration files for import at startup
       - ./config/import:/opt/keycloak/data/import:ro
@@ -82,9 +83,9 @@ services:
       - -g
       - "daemon off;"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
-      - ./docker/nginx/etc/ssl/certs/localhost.crt:/etc/ssl/certs/localhost.crt
-      - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/etc/ssl/certs/localhost.crt:/etc/ssl/certs/localhost.crt:ro
+      - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key:ro
     depends_on:
       - keycloak
 
