@@ -20,6 +20,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+    networks:
+      - auth
 
   # 2. Keycloak Server Service
   keycloak:
@@ -54,7 +56,10 @@ services:
       # Hostname configuration for development
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_HTTPS: false
-
+      KC_HOSTNAME: https://localhost/auth/
+      KC_HOSTNAME_ADMIN: https://localhost/auth/
+    networks:
+      - auth
     ports:
       - "8080:8080"
     command: >
@@ -66,6 +71,26 @@ services:
       # Mount realm configuration files for import at startup
       - ./config/import:/opt/keycloak/data/import:ro
 
+  proxy:
+    image: nginx
+    networks:
+      - auth
+    ports:
+      - '443:443'
+    command:
+      - nginx
+      - -g
+      - "daemon off;"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./docker/nginx/etc/ssl/certs/localhost.crt:/etc/ssl/certs/localhost.crt
+      - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key
+    depends_on:
+      - keycloak
+
+networks:
+  auth:
+    driver: bridge
 
 volumes:
   pgdata:
