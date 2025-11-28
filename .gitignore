@@ -27,3 +27,5 @@ gradle/wrapper/gradle-wrapper.jar.bak
 /docker/nginx/etc/ssl/certs/localhost.crt
 /docker/nginx/etc/ssl/private/localhost.key
 /gradle/wrapper/gradle-wrapper.jar
+
+

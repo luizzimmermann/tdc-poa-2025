@@ -1,0 +1,5 @@
+package envoy.authz
+
+import rego.v1
+
+allow := false
