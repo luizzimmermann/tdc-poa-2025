@@ -129,6 +129,20 @@ services:
       - --log-level=info
       - /policies
 
+  # 6. Spring Boot Application Service
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: app
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "8081:8080"  # Host 8081 -> container 8080 to avoid conflict with Keycloak
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
 networks:
   auth:
     driver: bridge
