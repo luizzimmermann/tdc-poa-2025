@@ -52,10 +52,10 @@ services:
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: true
       KC_HTTP_PORT: 8080
+      KC_HTTP_RELATIVE_PATH: /auth
       
       # Hostname configuration for development
       KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
       KC_HOSTNAME: https://localhost/auth/
       KC_HOSTNAME_ADMIN: https://localhost/auth/
     networks:
@@ -88,6 +88,7 @@ services:
       - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key
     depends_on:
       - keycloak
+      - app
 
   # 4. Envoy Proxy Service
   envoy:
@@ -113,7 +114,7 @@ services:
 
   # 5. Open Policy Agent (OPA) Service
   opa:
-    image: openpolicyagent/opa:latest
+    image: openpolicyagent/opa:latest-envoy
     container_name: opa-server
     restart: always
     networks:
@@ -126,7 +127,8 @@ services:
     command:
       - run
       - --server
-      - --log-level=info
+      - --log-level=debug
+      - --set=plugins.envoy_ext_authz_grpc.path=istio/authz/allow
       - /policies
 
   # 6. Spring Boot Application Service
