@@ -1,5 +1,5 @@
-package envoy.authz
+package istio.authz
 
 import rego.v1
 
-allow := false
+allow := true

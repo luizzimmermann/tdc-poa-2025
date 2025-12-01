@@ -115,6 +115,7 @@ services:
   # 5. Open Policy Agent (OPA) Service
   opa:
     image: openpolicyagent/opa:latest-envoy
+    platform: linux/amd64  # Required for ARM64 (Apple Silicon) compatibility
     container_name: opa-server
     restart: always
     networks:
@@ -128,7 +129,9 @@ services:
       - run
       - --server
       - --log-level=debug
+      - --log-format=json-pretty
       - --set=plugins.envoy_ext_authz_grpc.path=istio/authz/allow
+      - --set=decision_logs.console=true
       - /policies
 
   # 6. Spring Boot Application Service
