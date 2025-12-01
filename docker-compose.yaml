@@ -20,6 +20,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+    networks:
+      - auth
 
   # 2. Keycloak Server Service
   keycloak:
@@ -50,22 +52,105 @@ services:
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: true
       KC_HTTP_PORT: 8080
+      KC_HTTP_RELATIVE_PATH: /auth
       
       # Hostname configuration for development
       KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-
+      KC_HOSTNAME: https://localhost/auth/
+      KC_HOSTNAME_ADMIN: https://localhost/auth/
+    networks:
+      - auth
     ports:
       - "8080:8080"
-    command: >
-      bash -c "
-      /opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import --override &&
-      /opt/keycloak/bin/kc.sh start
-      "
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        /opt/keycloak/bin/kc.sh import --dir=/opt/keycloak/data/import --override=true &&
+        /opt/keycloak/bin/kc.sh start
     volumes:
       # Mount realm configuration files for import at startup
       - ./config/import:/opt/keycloak/data/import:ro
 
+  proxy:
+    image: nginx
+    networks:
+      - auth
+    ports:
+      - '443:443'
+    command:
+      - nginx
+      - -g
+      - "daemon off;"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./docker/nginx/etc/ssl/certs/localhost.crt:/etc/ssl/certs/localhost.crt
+      - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key
+    depends_on:
+      - keycloak
+      - app
+
+  # 4. Envoy Proxy Service
+  envoy:
+    image: envoyproxy/envoy:v1.33-latest
+    container_name: envoy-proxy
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "9901:9901"  # Admin interface
+      - "10000:10000"  # HTTP listener
+    volumes:
+      - ./docker/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    command:
+      - /usr/local/bin/envoy
+      - -c
+      - /etc/envoy/envoy.yaml
+      - --service-cluster
+      - envoy-proxy
+    depends_on:
+      - keycloak
+      - opa
+
+  # 5. Open Policy Agent (OPA) Service
+  opa:
+    image: openpolicyagent/opa:latest-envoy
+    platform: linux/amd64  # Required for ARM64 (Apple Silicon) compatibility
+    container_name: opa-server
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "8181:8181"  # OPA REST API
+      - "9191:9191"  # OPA gRPC server for Envoy ext_authz
+    volumes:
+      - ./docker/opa:/policies:ro
+    command:
+      - run
+      - --server
+      - --log-level=debug
+      - --log-format=json-pretty
+      - --set=plugins.envoy_ext_authz_grpc.path=istio/authz/allow
+      - --set=decision_logs.console=true
+      - /policies
+
+  # 6. Spring Boot Application Service
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: app
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "8081:8080"  # Host 8081 -> container 8080 to avoid conflict with Keycloak
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+networks:
+  auth:
+    driver: bridge
 
 volumes:
   pgdata:
