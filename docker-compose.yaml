@@ -62,11 +62,12 @@ services:
       - auth
     ports:
       - "8080:8080"
-    command: >
-      bash -c "
-      /opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import --override &&
-      /opt/keycloak/bin/kc.sh start
-      "
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        /opt/keycloak/bin/kc.sh import --dir=/opt/keycloak/data/import --override=true &&
+        /opt/keycloak/bin/kc.sh start
     volumes:
       # Mount realm configuration files for import at startup
       - ./config/import:/opt/keycloak/data/import:ro
@@ -87,6 +88,46 @@ services:
       - ./docker/nginx/etc/ssl/private/localhost.key:/etc/ssl/private/localhost.key
     depends_on:
       - keycloak
+
+  # 4. Envoy Proxy Service
+  envoy:
+    image: envoyproxy/envoy:v1.33-latest
+    container_name: envoy-proxy
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "9901:9901"  # Admin interface
+      - "10000:10000"  # HTTP listener
+    volumes:
+      - ./docker/envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    command:
+      - /usr/local/bin/envoy
+      - -c
+      - /etc/envoy/envoy.yaml
+      - --service-cluster
+      - envoy-proxy
+    depends_on:
+      - keycloak
+      - opa
+
+  # 5. Open Policy Agent (OPA) Service
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: opa-server
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "8181:8181"  # OPA REST API
+      - "9191:9191"  # OPA gRPC server for Envoy ext_authz
+    volumes:
+      - ./docker/opa:/policies:ro
+    command:
+      - run
+      - --server
+      - --log-level=info
+      - /policies
 
 networks:
   auth:
