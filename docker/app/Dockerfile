@@ -13,6 +13,11 @@ COPY gradle ./gradle
 
 RUN dos2unix gradlew && chmod +x gradlew
 
+# Download dependencies *before* copying source
+# This creates a cached layer. If you change src code, docker won't re-download jars.
+# (Note: 'dependencies' task downloads most, but not all. It's usually enough).
+RUN ./gradlew dependencies --no-daemon
+
 # Copy source code
 COPY src ./src
 
