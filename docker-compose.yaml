@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. PostgreSQL Database Service
+  # 1. PostgreSQL Database for Keycloak
   postgres:
     image: postgres:15
     container_name: keycloak-db
@@ -23,7 +23,7 @@ services:
     networks:
       - auth
 
-  # 2. Keycloak Server Service
+  # 2. Keycloak Server
   keycloak:
     # Use the base image (recommended for most cases)
     image: quay.io/keycloak/keycloak:26.4.6
@@ -72,6 +72,7 @@ services:
       # Mount realm configuration files for import at startup
       - ./config/import:/opt/keycloak/data/import:ro
 
+  # 3. Reverse Proxy to provide keycloak, api, and front-end via SSL
   proxy:
     image: nginx
     networks:
@@ -90,7 +91,7 @@ services:
       - keycloak
       - app
 
-  # 4. Envoy Proxy Service
+  # 4. Envoy Proxy
   envoy:
     image: envoyproxy/envoy:v1.33-latest
     container_name: envoy-proxy
@@ -112,7 +113,7 @@ services:
       - keycloak
       - opa
 
-  # 5. Open Policy Agent (OPA) Service
+  # 5. Open Policy Agent (OPA)
   opa:
     image: openpolicyagent/opa:latest-envoy
     platform: linux/amd64  # Required for ARM64 (Apple Silicon) compatibility
@@ -134,7 +135,7 @@ services:
       - --set=decision_logs.console=true
       - /policies
 
-  # 6. Spring Boot Application Service
+  # 6. Spring Boot Application
   app:
     build:
       context: .
