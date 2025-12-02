@@ -8,8 +8,8 @@ import {
   UserActivityService
 } from 'keycloak-angular';
 
-const localhostCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
-  urlPattern: /^(http:\/\/localhost:8181)(\/.*)?$/i
+const apiCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
+  urlPattern: /^(https:\/\/localhost)?(\/api)(\/.*)?$/i
 });
 
 export const provideKeycloakAngular = () =>
@@ -21,8 +21,8 @@ export const provideKeycloakAngular = () =>
     },
     initOptions: {
       onLoad: 'check-sso',
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-      redirectUri: window.location.origin + '/'
+      silentCheckSsoRedirectUri: window.location.origin + '/front/silent-check-sso.html',
+      redirectUri: window.location.origin + '/front/'
     },
     features: [
       withAutoRefreshToken({
@@ -35,7 +35,7 @@ export const provideKeycloakAngular = () =>
       UserActivityService,
       {
         provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-        useValue: [localhostCondition]
+        useValue: [apiCondition]
       }
     ]
   });
