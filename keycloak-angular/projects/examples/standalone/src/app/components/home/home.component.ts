@@ -1,6 +1,14 @@
-import { Component, OnDestroy } from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, timer } from 'rxjs';
+import { BehaviorSubject, Observable, of, take, timer } from 'rxjs';
+import {HttpClient} from "@angular/common/http";
+
+interface Item {
+  id: number;
+  name: string;
+  description: string;
+  createDate: string;
+}
 
 @Component({
   selector: 'app-home',
@@ -9,8 +17,16 @@ import { BehaviorSubject, timer } from 'rxjs';
   imports: [CommonModule]
 })
 export class HomeComponent implements OnDestroy {
+  private http = inject(HttpClient);
+
   private copyMessageSubject = new BehaviorSubject<string | null>(null);
   copyMessage$ = this.copyMessageSubject.asObservable(); // Expose as Observable
+
+  items$: Observable<Item[]> = of([]);
+
+  ngOnInit(): void {
+    this.reloadItems();
+  }
 
   copyToClipboard(text: string): void {
     navigator.clipboard
@@ -26,5 +42,26 @@ export class HomeComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.copyMessageSubject.complete();
+  }
+
+  private reloadItems() {
+    this.items$ = this.http.get<Item[]>('https://localhost/api/items');
+  }
+
+  deleteItem(id: number) {
+    this.http.delete(`https://localhost/api/items/${id}`).subscribe(() => {
+      this.reloadItems();
+    });
+  }
+
+  addItem() {
+    const random = Math.random().toString(36).substring(2, 15);
+    this.http.post<Item>('https://localhost/api/items', {
+      name: `New Item ${random}`,
+      description: `New Item Description ${random}`,
+      createDate: new Date().toISOString()
+    }).subscribe(() => {
+      this.reloadItems();
+    });
   }
 }
