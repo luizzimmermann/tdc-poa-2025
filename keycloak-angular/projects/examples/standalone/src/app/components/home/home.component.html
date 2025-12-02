@@ -1,0 +1,30 @@
+<div class="section">
+  <header>
+    <h1>Welcome to the Keycloak Angular Demo App!</h1>
+    <p class="description">This is the public homepage of your application.</p>
+  </header>
+
+  <main>
+    <section>
+      <p class="description">To access the application, use the following credentials for testing:</p>
+      <ul class="credentials">
+        <li>
+          <strong>User:</strong> <code>testuser</code>
+          <button class="copy-btn" (click)="copyToClipboard('testuser')" aria-label="Copy User">
+            <i class="copy-icon">📋</i>
+          </button>
+        </li>
+        <li>
+          <strong>Password:</strong> <code>password</code>
+          <button class="copy-btn" (click)="copyToClipboard('password')" aria-label="Copy Password">
+            <i class="copy-icon">📋</i>
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <div *ngIf="copyMessage$ | async as copyMessage" class="message-box">
+      {{ copyMessage }}
+    </div>
+  </main>
+</div>

@@ -1,0 +1,87 @@
+{
+  "name": "keycloak-angular",
+  "version": "20.0.0",
+  "description": "Easy Keycloak integration for Angular applications.",
+  "scripts": {
+    "build": "ng build keycloak-angular --configuration production",
+    "test": "ng test keycloak-angular",
+    "lint": "ng lint && prettier -c .",
+    "lint:fix": "prettier --write .",
+    "serve:keycloak": "docker compose --project-directory projects/examples/docker up",
+    "serve:mockserver": "node projects/examples/mockserver/main.mjs",
+    "serve:example-ngmodule": "ng serve example-ngmodule",
+    "serve:example-standalone": "ng serve example-standalone",
+    "serve:example-fetch": "ng serve example-fetch_config",
+    "showcase:ngmodule": "npm run build && concurrently \"npm run serve:keycloak\" \"npm run serve:example-ngmodule\"",
+    "showcase:standalone": "npm run build && concurrently \"npm run serve:keycloak\"  \"npm run serve:mockserver\" \"npm run serve:example-standalone\"",
+    "showcase:fetch": "npm run build && concurrently \"npm run serve:keycloak\"  \"npm run serve:mockserver\" \"npm run serve:example-fetch\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/mauriciovigolo/keycloak-angular.git"
+  },
+  "author": {
+    "name": "Mauricio Gemelli Vigolo",
+    "email": "@mauriciovigolo.bsky.social",
+    "url": "https://github.com/mauriciovigolo"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mauriciovigolo/keycloak-angular/issues"
+  },
+  "homepage": "https://github.com/mauriciovigolo/keycloak-angular#readme",
+  "keywords": [
+    "angular",
+    "authentication",
+    "authorization",
+    "keycloak",
+    "keycloak-js"
+  ],
+  "dependencies": {
+    "@angular/animations": "^20.0.2",
+    "@angular/common": "^20.0.2",
+    "@angular/compiler": "^20.0.2",
+    "@angular/core": "^20.0.2",
+    "@angular/forms": "^20.0.2",
+    "@angular/platform-browser": "^20.0.2",
+    "@angular/platform-browser-dynamic": "^20.0.2",
+    "@angular/platform-server": "^20.0.2",
+    "@angular/router": "^20.0.2",
+    "@angular/ssr": "^20.0.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "keycloak-js": "^26.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^20.0.2",
+    "@angular-eslint/builder": "20.0.0",
+    "@angular-eslint/eslint-plugin": "20.0.0",
+    "@angular-eslint/eslint-plugin-template": "20.0.0",
+    "@angular-eslint/schematics": "20.0.0",
+    "@angular-eslint/template-parser": "20.0.0",
+    "@angular/build": "^20.0.2",
+    "@angular/cli": "^20.0.2",
+    "@angular/compiler-cli": "^20.0.2",
+    "@types/express": "^4.17.17",
+    "@types/jasmine": "^5.1.8",
+    "@types/node": "^22.15.29",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.17.0",
+    "jasmine-core": "^5.7.1",
+    "karma": "~6.4.3",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.1",
+    "karma-coverage-istanbul-reporter": "~3.0.3",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "^2.1.0",
+    "ng-packagr": "^20.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "~5.8.0"
+  }
+}
