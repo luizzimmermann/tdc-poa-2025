@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: tdc-poa-2025
+
 services:
   # 1. PostgreSQL Database for Keycloak
   postgres:
