@@ -8,7 +8,10 @@ import {
   provideHttpClient,
   withInterceptors
 } from '@angular/common/http';
-import { includeBearerTokenInterceptor } from 'keycloak-angular';
+import {
+  createInterceptorCondition,
+  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG, IncludeBearerTokenCondition, includeBearerTokenInterceptor
+} from 'keycloak-angular';
 import Keycloak from 'keycloak-js';
 
 import { provideKeycloakAngular } from './keycloak.config';
@@ -46,9 +49,18 @@ export const insufficientUserAuthenticationErrorInterceptor = (
 
 };
 
+const urlCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
+  urlPattern: /^(https:\/\/localhost\/api)(\/.*)?$/i,
+  bearerPrefix: 'Bearer'
+});
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideKeycloakAngular(),
+    {
+      provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+      useValue: [urlCondition]
+    },
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor, insufficientUserAuthenticationErrorInterceptor]))
