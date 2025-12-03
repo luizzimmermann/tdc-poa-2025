@@ -232,10 +232,11 @@ docker compose ps postgres
 
 ## Exporting keycloak realm
 ```shell
-docker exec keycloak-server /opt/keycloak/bin/kc.sh export --dir /tmp/keycloak-export --realm sample-tdc
+docker exec keycloak-server /opt/keycloak/bin/kc.sh export --dir /tmp/keycloak-export --realm sample-tdc --users different_files
 ```
 ```shell
-docker cp keycloak-server:/tmp/keycloak-export/sample-tdc-realm.json ./config/import
+docker cp keycloak-server:/tmp/keycloak-export/sample-tdc-realm.json ./config/import; 
+docker cp keycloak-server:/tmp/keycloak-export/sample-tdc-users-0.json ./config/import; 
 ```
 
 ## Additional Resources
