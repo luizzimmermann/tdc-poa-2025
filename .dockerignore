@@ -1,0 +1,33 @@
+# Dependencies (will be installed fresh in container)
+node_modules
+keycloak-angular/node_modules
+
+# Build artifacts (will be built in container)
+dist
+keycloak-angular/dist
+
+# IDE and editor
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage
+
+# Temp files
+tmp
+temp
+

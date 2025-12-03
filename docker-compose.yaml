@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: tdc-poa-2025
+
 services:
   # 1. PostgreSQL Database for Keycloak
   postgres:
@@ -90,6 +92,7 @@ services:
     depends_on:
       - keycloak
       - app
+      - frontend
 
   # 4. Envoy Proxy
   envoy:
@@ -148,6 +151,18 @@ services:
       - "8081:8080"  # Host 8081 -> container 8080 to avoid conflict with Keycloak
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+
+  # 7. Angular Frontend Application
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: frontend
+    restart: always
+    networks:
+      - auth
+    ports:
+      - "4200:80"  # Expose on port 4200 for direct access (optional)
 
 networks:
   auth:

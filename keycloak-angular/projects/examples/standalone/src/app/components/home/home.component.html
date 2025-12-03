@@ -1,0 +1,49 @@
+<div class="section">
+  <header>
+    <h1>Welcome to the Keycloak Angular Demo App!</h1>
+    <p class="description">This is the public homepage of your application.</p>
+  </header>
+
+  <main>
+    <section>
+      <p class="description">To access the application, use the following credentials for testing:</p>
+      <ul class="credentials">
+        <li>
+          <strong>User:</strong> <code>testuser</code>
+          <button class="copy-btn" (click)="copyToClipboard('testuser')" aria-label="Copy User">
+            <i class="copy-icon">📋</i>
+          </button>
+        </li>
+        <li>
+          <strong>Password:</strong> <code>password</code>
+          <button class="copy-btn" (click)="copyToClipboard('password')" aria-label="Copy Password">
+            <i class="copy-icon">📋</i>
+          </button>
+        </li>
+      </ul>
+
+      @if (items$ | async; as items) {
+        <section class="items-section">
+          <h2>Items</h2>
+          <div class="items-grid">
+            @for (item of items; track item.id) {
+              <article class="item-card">
+                <div class="item-header">
+                  <h3 class="item-name">{{ item.name }}</h3>
+                  <button class="delete-btn" (click)="deleteItem(item.id)" aria-label="Delete item">
+                    🗑️
+                  </button>
+                </div>
+                <p class="item-description">{{ item.description }}</p>
+                <time class="item-date">{{ item.createDate | date:'MMM d, yyyy' }}</time>
+              </article>
+            } @empty {
+              <p class="empty-message">No items available.</p>
+            }
+            <button class="add-btn" (click)="addItem()" aria-label="Add item">➕</button>
+          </div>
+        </section>
+      }
+    </section>
+  </main>
+</div>
