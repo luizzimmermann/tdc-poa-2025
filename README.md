@@ -44,11 +44,13 @@ This will start:
 Once all services are running, access Keycloak at:
 
 **URL:** https://localhost/auth
+
 **Credentials:**
 - Username: `admin`
 - Password: `adminpassword`
 
 **URL:** https://localhost/front
+
 **Credentials:**
 - Username: `testuser`
 - Password: `password`
