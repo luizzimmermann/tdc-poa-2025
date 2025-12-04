@@ -41,19 +41,26 @@ This will start:
 
 ### 3. Access the Application
 
-Once all services are running, access Keycloak at:
-
-**URL:** https://localhost/auth
-
-**Credentials:**
-- Username: `admin`
-- Password: `adminpassword`
+Once all services are running, to experiment with the example:
+- Open the front-end URL
+- Click on login, and enter the credentials
+- You will see a list of items, try to add a new one, and delete one.
+- At first time, Keycloak will ask you to set a 2FA and a passkey, depending on the flow you chose, after the setup log off the application and execute the flows again, now with an account fully configured.
 
 **URL:** https://localhost/front
 
 **Credentials:**
 - Username: `testuser`
 - Password: `password`
+
+
+
+Access Keycloak at:
+**URL:** https://localhost/auth
+
+**Credentials:**
+- Username: `admin`
+- Password: `adminpassword`
 
 ### 4. Access Other Services
 
