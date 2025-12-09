@@ -1,7 +1,7 @@
 <div class="section">
   <header>
-    <h1>Welcome to the Keycloak Angular Demo App!</h1>
-    <p class="description">This is the public homepage of your application.</p>
+    <h1>Welcome to the TDC POA 2025 Demo App!</h1>
+    <p class="description">Modernizing Authentication and Authorization</p>
   </header>
 
   <main>
@@ -19,6 +19,10 @@
           <button class="copy-btn" (click)="copyToClipboard('password')" aria-label="Copy Password">
             <i class="copy-icon">📋</i>
           </button>
+        </li>
+        <li>
+          <strong>Current ACR:</strong>
+          {{ token?.acr }}
         </li>
       </ul>
 
@@ -43,6 +47,12 @@
             <button class="add-btn" (click)="addItem()" aria-label="Add item">➕</button>
           </div>
         </section>
+      }
+
+      @if (token) {
+        <pre>
+          {{ token | json }}
+        </pre>
       }
     </section>
   </main>
