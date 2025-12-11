@@ -1,7 +1,8 @@
-import {Component, inject, OnDestroy} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject, Observable, of, take, timer } from 'rxjs';
 import {HttpClient} from "@angular/common/http";
+import Keycloak, {KeycloakTokenParsed} from "keycloak-js";
 
 interface Item {
   id: number;
@@ -16,16 +17,19 @@ interface Item {
   styleUrls: ['./home.component.css'],
   imports: [CommonModule]
 })
-export class HomeComponent implements OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
+  private keycloak = inject(Keycloak);
 
   private copyMessageSubject = new BehaviorSubject<string | null>(null);
   copyMessage$ = this.copyMessageSubject.asObservable(); // Expose as Observable
 
   items$: Observable<Item[]> = of([]);
+  token: KeycloakTokenParsed | null;
 
   ngOnInit(): void {
     this.reloadItems();
+    this.showToken();
   }
 
   copyToClipboard(text: string): void {
@@ -38,6 +42,10 @@ export class HomeComponent implements OnDestroy {
       .catch((err) => {
         this.copyMessageSubject.next('Failed to copy text. Please try again.');
       });
+  }
+
+  showToken(): void {
+    this.token = this.keycloak.tokenParsed || null;
   }
 
   ngOnDestroy(): void {
